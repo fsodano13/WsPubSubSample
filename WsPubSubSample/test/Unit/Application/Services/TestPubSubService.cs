@@ -157,7 +157,7 @@ namespace Tests.Unit.Application.Services
 
             //Assert
             res.Should().BeTrue();
-            _sender.Verify(x => x.Send(It.Is<NotifyCommand>(c => c.Subscribers == subscribersSet &&
+            _sender.Verify(x => x.Send(It.Is<NotifyCommand>(c => c.Subscribers!.Contains(sub) &&
                                                             c.Publisher == pub &&
                                                             c.Channel == "HELLO" &&
                                                             c.Message == "WORLD"), CancellationToken.None));

@@ -13,6 +13,13 @@ namespace Application.Services
 
         public void Reset() => Clients.Clear();
 
+        public async Task SendAllAsync(string message, Guid publisher)
+        {
+            await Task.WhenAll(Clients.Keys
+                .Where(c => c != publisher)
+                .Select(c => Clients[c].SendAsync(message)));
+        }
+
         public async Task SendAsync(Guid client, string message) =>
             await (Clients.GetValueOrDefault(client)?.SendAsync(message) ?? Task.CompletedTask);
     }

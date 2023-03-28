@@ -1,4 +1,5 @@
 using Application.Abstractions;
+using Application.Commands.Broadcast;
 using Application.Commands.PubSub;
 using Application.Models;
 using FluentAssertions;
@@ -32,13 +33,15 @@ namespace Tests.Unit.Application.Commands
             res.ErrorMessage.Should().Be(ErrorMessages.MalformedCommand);
         }
 
-        [Fact]
-        public async void Given_Invalid_String_When_Handle_Then_Return_Malformed_Command()
+        [Theory]
+        [InlineData("AAA BBB")]
+        [InlineData("AAA")]
+        public async void Given_Invalid_String_When_Handle_Then_Return_Malformed_Command(string data)
         {
             //Arrange
             var cmd = new PubSubCommand
             {
-                Data = "AAA BBB"
+                Data = data
             };
 
             //Act
@@ -49,13 +52,16 @@ namespace Tests.Unit.Application.Commands
             res.ErrorMessage.Should().Be(ErrorMessages.MalformedCommand);
         }
 
-        [Fact]
-        public async void Given_Unknown_Command_When_Handle_Then_Return_Unknown_Command()
+        [Theory]
+        [InlineData("XXX|CHANNEL1")]
+        [InlineData("sub|AAA")]
+        [InlineData("pub|AAA")]
+        public async void Given_Unknown_Command_When_Handle_Then_Return_Unknown_Command(string data)
         {
             //Arrange
             var cmd = new PubSubCommand
             {
-                Data = "XXX|CHANNEL1"
+                Data = data
             };
 
             //Act
@@ -66,13 +72,17 @@ namespace Tests.Unit.Application.Commands
             res.ErrorMessage.Should().Be(ErrorMessages.UnknownCommand);
         }
 
-        [Fact]
-        public async void Given_Missing_Channel_When_Handle_Then_Return_Malformed_Command()
+        [Theory]
+        [InlineData("SUB|")]
+        [InlineData("SUB")]
+        [InlineData("UNS|")]
+        [InlineData("UNS")]
+        public async void Given_Missing_Channel_When_Handle_SUB_or_PUB_Command_Then_Return_Malformed_Command(string data)
         {
             //Arrange
             var cmd = new PubSubCommand
             {
-                Data = "SUB|"
+                Data = data
             };
 
             //Act
@@ -152,6 +162,38 @@ namespace Tests.Unit.Application.Commands
             //Assert
             _pubSubSevice.Verify(X => X.Publish("CHANNEL1", "HELLO", cmd.Client), Times.Once());
             res.IsValid.Should().BeTrue();
+        }
+
+        [Fact]
+        public async void Given_Broadcast_Cmd_When_Handle_Then_Return_Is_Valid()
+        {
+            //Arrange
+            var cmd = new PubSubCommand()
+            {
+                Data = "BRD|HELLO"
+            };
+
+            //Act
+            var res = await _sut.Handle(cmd, CancellationToken.None);
+
+            //Assert
+            res.IsValid.Should().BeTrue();
+        }
+
+        [Fact]
+        public async void Given_Broadcast_Cmd_When_Handle_And_Msg_Undefined_Then_Message_is_NotValid()
+        {
+            //Arrange
+            var cmd = new PubSubCommand()
+            {
+                Data = "BRD|"
+            };
+
+            //Act
+            var res = await _sut.Handle(cmd, CancellationToken.None);
+
+            //Assert
+            res.IsValid.Should().BeFalse();
         }
     }
 }

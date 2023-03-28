@@ -11,5 +11,7 @@ namespace Application.Abstractions
         void Unsubscribe(Guid subscriber);
 
         void Reset();
+
+        Task<bool> BroadcastAll(string message, Guid publisher);
     }
 }

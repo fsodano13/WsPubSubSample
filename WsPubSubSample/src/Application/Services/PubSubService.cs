@@ -1,7 +1,9 @@
 using Application.Abstractions;
+using Application.Commands.Broadcast;
 using Application.Commands.Notify;
 using MediatR;
 using System.Collections.Concurrent;
+using static System.Net.WebRequestMethods;
 
 namespace Application.Services
 {
@@ -30,21 +32,36 @@ namespace Application.Services
 
         public async Task<bool> Publish(string channel, string message, Guid publisher)
         {
-            if (Channels.ContainsKey(channel) && Channels[channel].Count() > 0)
+            if (Channels.ContainsKey(channel))
             {
-                await _mediator.Send(new NotifyCommand
+                HashSet<Guid> subscribers = Channels[channel].Where(c => c != publisher).ToHashSet();
+                if (subscribers.Count > 0)
                 {
-                    Message = message,
-                    Publisher = publisher,
-                    Channel = channel,
-                    Subscribers = Channels[channel]
-                });
+                    await _mediator.Send(new NotifyCommand
+                    {
+                        Message = message,
+                        Publisher = publisher,
+                        Channel = channel,
+                        Subscribers = subscribers,
+                    });
 
-                return true;
+                    return true;
+                }
             }
             return false;
         }
 
         public void Reset() => Channels.Clear();
+
+        public async Task<bool> BroadcastAll(string message, Guid publisher)
+        {
+            await _mediator.Send(new BroadcastCommand
+            {
+                Data = message,
+                Publisher = publisher,
+            });
+
+            return true;
+        }
     }
 }

@@ -47,12 +47,11 @@ namespace Tests.Integration.Application
                 Client = Guid.NewGuid(),
             });
 
-            await Task.Delay(1);
             subMoq.Verify(X => X.SendAsync($"CHN:{_fooChannel}|HELLO"), Times.Once());
         }
 
         [Fact]
-        public async Task Given_Two_Subscribers_When_Pub_Msg_Arrives_And_Only_A_Client_Is_Subscribed__Then_This_One_Receives_Msg()
+        public async Task Given_Two_Subscribers_When_Pub_Msg_Arrives_And_Only_A_Client_Is_Subscribed_Then_This_One_Receives_Msg()
         {
             var subGuid1 = Guid.NewGuid();
             var subGuid2 = Guid.NewGuid();
@@ -75,8 +74,6 @@ namespace Tests.Integration.Application
                 Data = $"PUB|{_fooChannel}|HELLO",
                 Client = Guid.NewGuid(),
             });
-
-            await Task.Delay(1);
 
             subMoq1.Verify(X => X.SendAsync($"CHN:{_fooChannel}|HELLO"), Times.Once());
             subMoq2.Verify(X => X.SendAsync($"CHN:{_fooChannel}|HELLO"), Times.Never());
@@ -107,8 +104,6 @@ namespace Tests.Integration.Application
                 Client = Guid.NewGuid(),
             });
 
-            await Task.Delay(1);
-
             subMoq1.Verify(X => X.SendAsync($"CHN:{_fooChannel}|HELLO"), Times.Once());
             subMoq2.Verify(X => X.SendAsync($"CHN:{_fooChannel}|HELLO"), Times.Once());
         }
@@ -129,8 +124,6 @@ namespace Tests.Integration.Application
                 Data = $"PUB|{_barChannel}|HELLO",
                 Client = Guid.NewGuid(),
             });
-
-            await Task.Delay(1);
 
             subMoq.Verify(X => X.SendAsync($"CHN:{_fooChannel}|HELLO"), Times.Never());
         }
@@ -156,9 +149,61 @@ namespace Tests.Integration.Application
                 Client = Guid.NewGuid(),
             });
 
-            //await Task.Delay(1);
-
             subMoq.Verify(X => X.SendAsync($"CHN:{_fooChannel}|HELLO"), Times.Never());
+        }
+
+        [Fact]
+        public async Task Given_A_Client_And_No_Others_More_When_It_Sends_Brd_Msg_Then_This_Does_not_Receive_The_msg()
+        {
+            var subGuid1 = Guid.NewGuid();
+
+            var subMoq1 = new Mock<IClient>();
+            subMoq1.Setup(c => c.ClientId).Returns(subGuid1);
+            subMoq1.Setup(c => c.SendAsync(It.IsAny<string>())).Returns(Task.CompletedTask).Verifiable();
+
+            _clientService.AddClient(subMoq1.Object);
+
+            await _mediator.Send(new PubSubCommand
+            {
+                Data = $"BRD|HELLO",
+                Client = subGuid1,
+            });
+
+            subMoq1.Verify(X => X.SendAsync("BRD:HELLO"), Times.Never());
+        }
+
+        [Fact]
+        public async Task Given_Some_Clients_When_Brd_Msg_Arrives_Then_All_The_Clients_Except_The_Publisher_Receive_Msg()
+        {
+            var subGuid1 = Guid.NewGuid();
+            var subGuid2 = Guid.NewGuid();
+            var subGuid3 = Guid.NewGuid();
+
+            var subMoq1 = new Mock<IClient>();
+            subMoq1.Setup(c => c.ClientId).Returns(subGuid1);
+            subMoq1.Setup(c => c.SendAsync(It.IsAny<string>())).Returns(Task.CompletedTask).Verifiable();
+
+            var subMoq2 = new Mock<IClient>();
+            subMoq2.Setup(c => c.ClientId).Returns(subGuid2);
+            subMoq2.Setup(c => c.SendAsync(It.IsAny<string>())).Returns(Task.CompletedTask).Verifiable();
+
+            var subMoq3 = new Mock<IClient>();
+            subMoq3.Setup(c => c.ClientId).Returns(subGuid3);
+            subMoq3.Setup(c => c.SendAsync(It.IsAny<string>())).Returns(Task.CompletedTask).Verifiable();
+
+            _clientService.AddClient(subMoq1.Object);
+            _clientService.AddClient(subMoq2.Object);
+            _clientService.AddClient(subMoq2.Object);
+
+            await _mediator.Send(new PubSubCommand
+            {
+                Data = $"BRD|HELLO",
+                Client = subGuid3,
+            });
+
+            subMoq1.Verify(X => X.SendAsync("BRD:HELLO"), Times.Once());
+            subMoq2.Verify(X => X.SendAsync("BRD:HELLO"), Times.Once());
+            subMoq3.Verify(X => X.SendAsync("BRD:HELLO"), Times.Never());
         }
     }
 }

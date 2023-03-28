@@ -8,6 +8,8 @@ namespace Application.Abstractions
 
         void Reset();
 
+        Task SendAllAsync(string message, Guid publisher);
+
         Task SendAsync(Guid client, string message);
     }
 }
