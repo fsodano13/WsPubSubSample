@@ -12,11 +12,11 @@ The channels are created on the fly during subscribe request, if not already exi
 
 The protocol for commands is quite simple. Clients can send almost 1024 ASCII characters.
 
-The format is: CMD|CHANNEL|MESSAGE
+The format is: CMD|CHANNEL|MESSAGE or BRD|MESSAGE
 
 Pipe character is used to separate each part of the payload.
 
-CMD is 3 characters string. Digit PUB for PUBLISH, SUB for SUBSCRIBE, UNS for UNSUBSCRIBE. 
+CMD is 3 characters string. Digit PUB for PUBLISH, SUB for SUBSCRIBE, UNS for UNSUBSCRIBE, BRD for BROADCAST. 
 Pay attention, the protocol is case sensitive.
 
 The remainder of the paylod can be as long as you like, but the total sum of the characters must fall within the maximum limit of the packet of 1024 characters, otherwhise message is truncated.
@@ -24,11 +24,26 @@ The remainder of the paylod can be as long as you like, but the total sum of the
 MESSAGE is required only for PUB commands.
 
 ## Examples
-SUB|HELLO
 
-UNS|HELLO
+# Commands:
 
-PUB|HELLO|WORLD
+1. SUB|CHANNEL1
+
+2. UNS|CHANNEL1
+
+3. PUB|CHANNEL1|HELLO
+
+4. BRD|HELLO
+
+# Responses
+OK  (message received by publisher, if command is valid)
+
+ERR|(ERROR_MESSAGE) (message received by publisher, if command is invalid; ERROR_MESSAGE describes the reason)
+
+CHN:CHANNEL1|HELLO (message received by subscribers of CHANNEL1)
+
+BRD:HELLO (brodcast message received)
+
 
 
 ## Usage
