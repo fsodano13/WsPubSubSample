@@ -25,7 +25,7 @@ MESSAGE is required only for PUB commands.
 
 ## Examples
 
-# Commands:
+### Commands:
 
 1. SUB|CHANNEL1
 
@@ -35,7 +35,7 @@ MESSAGE is required only for PUB commands.
 
 4. BRD|HELLO
 
-# Responses
+### Responses
 OK  (message received by publisher, if command is valid)
 
 ERR|(ERROR_MESSAGE) (message received by publisher, if command is invalid; ERROR_MESSAGE describes the reason)
