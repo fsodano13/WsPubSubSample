@@ -1,7 +1,7 @@
-using System.Net.WebSockets;
-using System.Text;
 using Application.Abstractions;
 using Application.Models;
+using System.Net.WebSockets;
+using System.Text;
 
 namespace Presentation.Clients
 {

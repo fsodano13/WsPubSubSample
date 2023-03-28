@@ -1,5 +1,5 @@
-using System.Collections.Concurrent;
 using Application.Abstractions;
+using System.Collections.Concurrent;
 
 namespace Application.Services
 {
@@ -10,6 +10,8 @@ namespace Application.Services
         public bool AddClient(IClient client) => Clients.TryAdd(client.ClientId, client);
 
         public bool RemoveClient(Guid guid) => Clients.Remove(guid, out _);
+
+        public void Reset() => Clients.Clear();
 
         public async Task SendAsync(Guid client, string message) =>
             await (Clients.GetValueOrDefault(client)?.SendAsync(message) ?? Task.CompletedTask);

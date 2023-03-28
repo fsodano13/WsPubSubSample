@@ -1,6 +1,6 @@
-using System.Reflection;
 using Application.Abstractions;
 using Application.Services;
+using System.Reflection;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -25,3 +25,6 @@ app.UseStaticFiles();
 app.MapControllers();
 
 app.Run();
+
+public partial class Program
+{ }

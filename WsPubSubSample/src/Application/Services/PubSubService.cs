@@ -1,7 +1,7 @@
-using System.Collections.Concurrent;
 using Application.Abstractions;
 using Application.Commands.Notify;
 using MediatR;
+using System.Collections.Concurrent;
 
 namespace Application.Services
 {
@@ -17,15 +17,15 @@ namespace Application.Services
             _mediator = mediator;
         }
 
-        public bool Subscribe(string channel, Guid subscriber) =>
+        public bool SubscribeChannel(string channel, Guid subscriber) =>
             Channels.ContainsKey(channel) ?
             Channels[channel].Add(subscriber) :
             Channels.TryAdd(channel, new HashSet<Guid> { subscriber });
 
-        public bool Unsubscribe(string channel, Guid subscriber) =>
+        public bool UnsubscribeChannel(string channel, Guid subscriber) =>
             Channels[channel].Remove(subscriber);
 
-        public void UnsubscribeAll(Guid subscriber) =>
+        public void Unsubscribe(Guid subscriber) =>
             Parallel.ForEach(Channels.Keys, (key, channel) => Channels[key].Remove(subscriber));
 
         public async Task<bool> Publish(string channel, string message, Guid publisher)
@@ -44,5 +44,7 @@ namespace Application.Services
             }
             return false;
         }
+
+        public void Reset() => Channels.Clear();
     }
 }

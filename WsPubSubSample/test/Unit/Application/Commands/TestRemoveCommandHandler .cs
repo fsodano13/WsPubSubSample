@@ -31,7 +31,7 @@ namespace Tests.Unit.Application.Commands
 
             //Assert
             _clientSevice.Verify(X => X.RemoveClient(client));
-            _pubSubService.Verify(X => X.UnsubscribeAll(client));
+            _pubSubService.Verify(X => X.Unsubscribe(client));
         }
     }
 }

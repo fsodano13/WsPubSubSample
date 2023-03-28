@@ -1,5 +1,3 @@
-using Application.Abstractions;
-using Application.Commands.AddClient;
 using Application.Commands.Notify;
 using Application.Services;
 using FluentAssertions;
@@ -12,7 +10,7 @@ namespace Tests.Unit.Application.Services
     public class TestPubSubService
     {
         private readonly PubSubService _sut;
-        private Mock<ISender> _sender = new Mock<ISender>();
+        private readonly Mock<ISender> _sender = new Mock<ISender>();
 
         public TestPubSubService()
         {
@@ -26,7 +24,7 @@ namespace Tests.Unit.Application.Services
             var subscriber = Guid.NewGuid();
 
             //Act
-            var res = _sut.Subscribe("HELLO", subscriber);
+            var res = _sut.SubscribeChannel("HELLO", subscriber);
 
             //Assert
             res.Should().BeTrue();
@@ -39,10 +37,10 @@ namespace Tests.Unit.Application.Services
         {
             //Arrange
             var subscriber = Guid.NewGuid();
-            var res = _sut.Subscribe("HELLO", subscriber);
+            var res = _sut.SubscribeChannel("HELLO", subscriber);
 
             //Act
-            res = _sut.Subscribe("HELLO", subscriber);
+            res = _sut.SubscribeChannel("HELLO", subscriber);
 
             //Assert
             res.Should().BeFalse();
@@ -58,8 +56,8 @@ namespace Tests.Unit.Application.Services
             var subscriber2 = Guid.NewGuid();
 
             //Act
-            var res = _sut.Subscribe("HELLO", subscriber);
-            res = _sut.Subscribe("HELLO", subscriber2);
+            var res = _sut.SubscribeChannel("HELLO", subscriber);
+            res = _sut.SubscribeChannel("HELLO", subscriber2);
 
             //Assert
             res.Should().BeTrue();
@@ -73,11 +71,11 @@ namespace Tests.Unit.Application.Services
             //Arrange
             var subscriber = Guid.NewGuid();
             var subscriber2 = Guid.NewGuid();
-            var res = _sut.Subscribe("HELLO", subscriber);
-            res = _sut.Subscribe("HELLO", subscriber2);
+            var res = _sut.SubscribeChannel("HELLO", subscriber);
+            res = _sut.SubscribeChannel("HELLO", subscriber2);
 
             //Act
-            res = _sut.Unsubscribe("HELLO", subscriber);
+            res = _sut.UnsubscribeChannel("HELLO", subscriber);
 
             //Assert
             res.Should().BeTrue();
@@ -93,10 +91,10 @@ namespace Tests.Unit.Application.Services
             //Arrange
             var subscriber = Guid.NewGuid();
             var subscriber2 = Guid.NewGuid();
-            var res = _sut.Subscribe("HELLO", subscriber);
+            var res = _sut.SubscribeChannel("HELLO", subscriber);
 
             //Act
-            res = _sut.Unsubscribe("HELLO", subscriber2);
+            res = _sut.UnsubscribeChannel("HELLO", subscriber2);
 
             //Assert
             res.Should().BeFalse();
@@ -108,14 +106,14 @@ namespace Tests.Unit.Application.Services
             //Arrange
             var subscriber = Guid.NewGuid();
             var subscriber2 = Guid.NewGuid();
-            var res = _sut.Subscribe("HELLO", subscriber);
-            res = _sut.Subscribe("HELLO", subscriber2);
-            res = _sut.Subscribe("HELLO2", subscriber);
-            res = _sut.Subscribe("HELLO2", subscriber2);
-            res = _sut.Subscribe("HELLO", subscriber);
+            var res = _sut.SubscribeChannel("HELLO", subscriber);
+            res = _sut.SubscribeChannel("HELLO", subscriber2);
+            res = _sut.SubscribeChannel("HELLO2", subscriber);
+            res = _sut.SubscribeChannel("HELLO2", subscriber2);
+            res = _sut.SubscribeChannel("HELLO", subscriber);
 
             //Act
-            _sut.UnsubscribeAll(subscriber);
+            _sut.Unsubscribe(subscriber);
 
             //Assert
             _sut.Channels.Where(c => c.Value.Contains(subscriber)).Count().Should().Be(0);
@@ -134,6 +132,7 @@ namespace Tests.Unit.Application.Services
         [Fact]
         public async Task Given_A_Channel_With_NO_Subscribers_When_Publish_Returns_False()
         {
+            //Arrange
             _sut.Channels.TryAdd("HELLO", new HashSet<Guid>());
 
             //Act
@@ -146,15 +145,22 @@ namespace Tests.Unit.Application.Services
         [Fact]
         public async Task Given_A_Channel_With_A_Subscribers_When_Publish_Returns_True()
         {
+            //Arrange
             var sub = Guid.NewGuid();
-            _sut.Channels.TryAdd("MEOW", new HashSet<Guid>() { Guid.NewGuid() });
+            var subscribersSet = new HashSet<Guid>() { sub };
+            _sut.Channels.TryAdd("HELLO", subscribersSet);
+
+            var pub = Guid.NewGuid();
 
             //Act
-            var res = await _sut.Publish("HELLO", "WORD", Guid.NewGuid());
+            var res = await _sut.Publish("HELLO", "WORLD", pub);
 
             //Assert
             res.Should().BeTrue();
-            _sender.Verify(x => x.Send(It.Is<NotifyCommand>(c => c.Subscribers.Contains(sub) && c.Channel == "HELLO" && c.Message == "WORLD"), CancellationToken.None));
+            _sender.Verify(x => x.Send(It.Is<NotifyCommand>(c => c.Subscribers == subscribersSet &&
+                                                            c.Publisher == pub &&
+                                                            c.Channel == "HELLO" &&
+                                                            c.Message == "WORLD"), CancellationToken.None));
         }
     }
 }

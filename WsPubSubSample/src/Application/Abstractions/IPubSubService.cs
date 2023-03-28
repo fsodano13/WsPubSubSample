@@ -4,10 +4,12 @@ namespace Application.Abstractions
     {
         Task<bool> Publish(string channel, string message, Guid publisher);
 
-        bool Subscribe(string channel, Guid subscriber);
+        bool SubscribeChannel(string channel, Guid subscriber);
 
-        bool Unsubscribe(string channel, Guid subscriber);
+        bool UnsubscribeChannel(string channel, Guid subscriber);
 
-        void UnsubscribeAll(Guid subscriber);
+        void Unsubscribe(Guid subscriber);
+
+        void Reset();
     }
 }

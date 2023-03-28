@@ -6,6 +6,8 @@ namespace Application.Abstractions
 
         bool RemoveClient(Guid guid);
 
+        void Reset();
+
         Task SendAsync(Guid client, string message);
     }
 }

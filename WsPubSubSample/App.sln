@@ -7,12 +7,15 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Web", "src\Web.csproj", "{C
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{53AA3679-C8FB-4C67-A10E-8914F674B5B6}"
 	ProjectSection(SolutionItems) = preProject
+		.editorconfig = .editorconfig
 		readme.md = readme.md
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{B79AAF67-BB9A-4A2D-8979-7D8104DF04B6}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Tests", "test\Tests.csproj", "{5F3DB4A1-B9D3-41D8-9DF9-925A1C0D641C}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "test", "test", "{A418ABA0-2516-469E-989D-8E1867E25A7C}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -34,6 +37,7 @@ Global
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{C11026F4-9B2F-4707-85DD-C3415534BE88} = {B79AAF67-BB9A-4A2D-8979-7D8104DF04B6}
+		{5F3DB4A1-B9D3-41D8-9DF9-925A1C0D641C} = {A418ABA0-2516-469E-989D-8E1867E25A7C}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {DCF85DD2-75DE-40C8-9609-6234346A5D97}

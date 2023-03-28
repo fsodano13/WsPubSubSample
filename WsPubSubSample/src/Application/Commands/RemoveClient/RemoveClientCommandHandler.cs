@@ -16,7 +16,7 @@ namespace Application.Commands.RemoveClient
 
         public Task Handle(RemoveClientCommand command, CancellationToken cancellationToken)
         {
-            _pubSubService.UnsubscribeAll(command.Client);
+            _pubSubService.Unsubscribe(command.Client);
             _clientsService.RemoveClient(command.Client);
             return Task.CompletedTask;
         }

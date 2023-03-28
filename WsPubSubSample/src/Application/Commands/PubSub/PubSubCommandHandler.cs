@@ -1,6 +1,6 @@
 using Application.Abstractions;
-using MediatR;
 using Application.Models;
+using MediatR;
 
 namespace Application.Commands.PubSub
 {
@@ -36,14 +36,14 @@ namespace Application.Commands.PubSub
 
                 case "SUB":
                     if (string.IsNullOrEmpty(parsed.Message))
-                        _service.Subscribe(parsed.Channel, command!.Client);
+                        _service.SubscribeChannel(parsed.Channel, command!.Client);
                     else
                         return Task.FromResult(new PubSubCommandResponse { ErrorMessage = ErrorMessages.MalformedCommand, IsValid = false });
                     break;
 
                 case "UNS":
                     if (string.IsNullOrEmpty(parsed.Message))
-                        _service.Unsubscribe(parsed.Channel, command!.Client);
+                        _service.UnsubscribeChannel(parsed.Channel, command!.Client);
                     else
                         return Task.FromResult(new PubSubCommandResponse { ErrorMessage = ErrorMessages.MalformedCommand, IsValid = false });
                     break;

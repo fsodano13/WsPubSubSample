@@ -1,8 +1,8 @@
 using Application.Abstractions;
 using Application.Commands.PubSub;
+using Application.Models;
 using FluentAssertions;
 using Moq;
-using Application.Models;
 using Xunit;
 
 namespace Tests.Unit.Application.Commands
@@ -114,7 +114,7 @@ namespace Tests.Unit.Application.Commands
             var res = await _sut.Handle(cmd, CancellationToken.None);
 
             //Assert
-            _pubSubSevice.Verify(X => X.Subscribe("CHANNEL1", cmd.Client), Times.Once());
+            _pubSubSevice.Verify(X => X.SubscribeChannel("CHANNEL1", cmd.Client), Times.Once());
             res.IsValid.Should().BeTrue();
         }
 
@@ -132,7 +132,7 @@ namespace Tests.Unit.Application.Commands
             var res = await _sut.Handle(cmd, CancellationToken.None);
 
             //Assert
-            _pubSubSevice.Verify(X => X.Unsubscribe("CHANNEL1", cmd.Client), Times.Once());
+            _pubSubSevice.Verify(X => X.UnsubscribeChannel("CHANNEL1", cmd.Client), Times.Once());
             res.IsValid.Should().BeTrue();
         }
 

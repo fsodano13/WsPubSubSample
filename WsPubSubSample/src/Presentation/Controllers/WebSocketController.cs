@@ -1,4 +1,3 @@
-using System.Net.WebSockets;
 using Application.Commands.AddClient;
 using Application.Commands.PubSub;
 using Application.Commands.RemoveClient;
@@ -6,6 +5,7 @@ using Application.Models;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using Presentation.Clients;
+using System.Net.WebSockets;
 
 namespace Presentation.Controllers;
 

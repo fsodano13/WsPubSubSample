@@ -1,5 +1,4 @@
 using Application.Abstractions;
-using Application.Commands.AddClient;
 
 using Application.Services;
 using FluentAssertions;
